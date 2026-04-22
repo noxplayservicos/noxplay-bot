@@ -1,5 +1,6 @@
-python-telegram-bot==20.7
-mercadopago
 fastapi
 uvicorn
-qrcode[pil]
+python-telegram-bot==20.7
+mercadopago
+qrcode
+pillow
