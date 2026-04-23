@@ -15,8 +15,8 @@ from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
 # ================= CONFIG =================
-TELEGRAM_TOKEN = ("8748292806:AAFxfJxMYPfPU1eDDTr5li3l5I2tK3GVphY")
-MP_ACCESS_TOKEN = ("APP_USR-8665539850358774-042117-8d004302e0aa99888db395195557a328-494371753")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN") or "8748292806:AAFxfJxMYPfPU1eDDTr5li3l5I2tK3GVphY"
+MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN") or "APP_USR-8665539850358774-042117-8d004302e0aa99888db395195557a328-494371753"
 
 CHAT_ID_VIP = -1003739412423
 CHAT_ID_FREE = -1003788752044
