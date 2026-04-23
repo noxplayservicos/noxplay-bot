@@ -224,13 +224,16 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================= RUN =================
 def run_bot():
+    import asyncio
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
     app_bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
     app_bot.add_handler(CommandHandler("start", start))
     app_bot.add_handler(CallbackQueryHandler(button))
 
     print("🤖 Bot rodando...")
-    app_bot.run_polling()
+    app_bot.run_polling(close_loop=False)
 
 def main():
     threading.Thread(target=run_bot).start()
