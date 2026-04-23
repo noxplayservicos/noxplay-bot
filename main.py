@@ -66,8 +66,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ================= PIX =================
-from datetime import datetime, timedelta
-
 from datetime import datetime, timedelta, timezone
 
 def criar_pix(user_id, valor):
