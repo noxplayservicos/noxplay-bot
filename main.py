@@ -66,13 +66,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ================= PIX =================
+from datetime import datetime, timedelta
+
 def criar_pix(user_id, valor):
     data = {
         "transaction_amount": float(valor),
         "description": f"user-{user_id}",
         "payment_method_id": "pix",
-        "payer": {"email": "test@test.com"}
+        "date_of_expiration": (datetime.utcnow() + timedelta(minutes=60)).isoformat(),
+        "payer": {
+            "email": "test@test.com"
+        }
     }
+
     return sdk.payment().create(data)
 
 async def gerar_pix(update, valor):
