@@ -163,16 +163,22 @@ async def verificar_expiracoes():
 @app.post("/webhook")
 async def webhook(request: Request):
     data = await request.json()
+    print("WEBHOOK:", data)
 
     if data.get("type") == "payment":
         payment_id = data["data"]["id"]
-        payment = sdk.payment().get(payment_id)
 
-        if payment["response"]["status"] == "approved":
+        payment = sdk.payment().get(payment_id)
+        print("PAGAMENTO:", payment)
+
+        status = payment["response"].get("status")
+
+        if status == "approved":
             descricao = payment["response"]["description"]
             user_id = int(descricao.split("-")[1])
-
             valor = str(payment["response"]["transaction_amount"])
+
+            print("✅ PAGAMENTO APROVADO:", user_id)
 
             await liberar_acesso(user_id, valor)
 
