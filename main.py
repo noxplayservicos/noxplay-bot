@@ -84,10 +84,13 @@ def criar_pix(user_id, valor):
 
 async def gerar_pix(update, valor):
     query = update.callback_query
+
     res = criar_pix(query.from_user.id, valor)
 
+    print("RESPOSTA MP:", res)  # 👈 IMPORTANTE
+
     if res["status"] != 201:
-        await query.message.reply_text("❌ Erro ao gerar pagamento.")
+        await query.message.reply_text(f"❌ ERRO MP:\n{res}")
         return
 
     tx = res["response"]["point_of_interaction"]["transaction_data"]
