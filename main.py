@@ -11,7 +11,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 TELEGRAM_TOKEN = ("8748292806:AAFxfJxMYPfPU1eDDTr5li3l5I2tK3GVphY")
 MP_ACCESS_TOKEN = ("APP_USR-4158707768099151-042117-fe3fc6dade05ab2121dc72e60db28db0-3352200768")
 
-GRUPO_VIP = "https://t.me/seugrupovip"
+GRUPO_VIP = "https://t.me/+jgzEK955llI1ZGUx"
 GRUPO_FREE = "https://t.me/seugrupofree"
 
 sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
