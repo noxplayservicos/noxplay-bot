@@ -68,12 +68,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================= PIX =================
 from datetime import datetime, timedelta
 
+from datetime import datetime, timedelta, timezone
+
 def criar_pix(user_id, valor):
     data = {
         "transaction_amount": float(valor),
         "description": f"user-{user_id}",
         "payment_method_id": "pix",
-        "date_of_expiration": (datetime.utcnow() + timedelta(minutes=60)).isoformat(),
+        # ⬇️ expira em 60 minutos, com timezone correto
+        "date_of_expiration": (datetime.now(timezone.utc) + timedelta(minutes=60)).isoformat(),
         "payer": {
             "email": "test@test.com"
         }
