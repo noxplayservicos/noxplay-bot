@@ -65,7 +65,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
-    print("TOKEN USADO:", MP_ACCESS_TOKEN[:10])
 
 # ================= PIX =================
 
