@@ -65,6 +65,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
+    print("TOKEN USADO:", MP_ACCESS_TOKEN[:10])
+
 # ================= PIX =================
 
 def criar_pix(user_id, valor):
@@ -73,7 +75,7 @@ def criar_pix(user_id, valor):
         "description": f"user-{user_id}",
         "payment_method_id": "pix",
         "payer": {
-            "email": "test@test.com"
+            "email": "test_user@test.com"
         }
     }
 
