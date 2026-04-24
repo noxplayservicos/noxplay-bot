@@ -38,13 +38,19 @@ async def startup():
 
 @app.post(f"/telegram/{TELEGRAM_TOKEN}")
 async def telegram_webhook(request: Request):
-    data = await request.json()
+    try:
+        data = await request.json()
+        print("🔥 UPDATE RECEBIDO:", data)
 
-    update = Update.de_json(data, telegram_app.bot)
+        update = Update.de_json(data, telegram_app.bot)
 
-    await telegram_app.process_update(update)
+        await telegram_app.process_update(update)
 
-    return {"ok": True}
+        return {"ok": True}
+
+    except Exception as e:
+        print("💥 ERRO NO WEBHOOK:", str(e))
+        return {"ok": False}
 
 
 # ================= WEBHOOK MP =================
