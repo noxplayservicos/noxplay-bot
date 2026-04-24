@@ -68,6 +68,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("🚀 Iniciando bot...")
+    await app_bot.initialize()
+    await app_bot.start()
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
 # ================= PIX =================
 def criar_pix(user_id, valor):
     data = {
@@ -188,6 +199,7 @@ async def webhook(request: Request):
 @app.post(f"/telegram/{TELEGRAM_TOKEN}")
 async def telegram_webhook(request: Request):
     data = await request.json()
+    print("🔥 CHEGOU:", data)
 
     update = Update.de_json(data, bot)
 
