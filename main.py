@@ -1,8 +1,6 @@
 import os
 import json
 import asyncio
-import threading
-import time
 from io import BytesIO
 from datetime import datetime, timedelta
 
@@ -40,6 +38,11 @@ def save_db():
 users_db = load_db()
 users_free = set()
 
+# ================= BOT GLOBAL =================
+bot = Bot(token=TELEGRAM_TOKEN)
+
+app_bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+
 # ================= TEMPO =================
 def get_tempo(valor):
     planos = {
@@ -65,9 +68,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
-
 # ================= PIX =================
-
 def criar_pix(user_id, valor):
     data = {
         "transaction_amount": float(valor),
@@ -77,15 +78,12 @@ def criar_pix(user_id, valor):
             "email": "test_user@test.com"
         }
     }
-
     return sdk.payment().create(data)
 
 async def gerar_pix(update, valor):
     query = update.callback_query
 
     res = criar_pix(query.from_user.id, valor)
-
-    print("RESPOSTA MP:", res)  # 👈 IMPORTANTE
 
     if res["status"] != 201:
         await query.message.reply_text(f"❌ ERRO MP:\n{res}")
@@ -108,8 +106,6 @@ async def gerar_pix(update, valor):
 
 # ================= LIBERAR =================
 async def liberar_acesso(user_id, valor):
-    bot = Bot(token=TELEGRAM_TOKEN)
-
     tempo = get_tempo(valor)
     expira = datetime.now() + tempo
 
@@ -139,8 +135,6 @@ async def liberar_acesso(user_id, valor):
 
 # ================= EXPIRAÇÃO =================
 async def verificar_expiracoes():
-    bot = Bot(token=TELEGRAM_TOKEN)
-
     while True:
         agora = datetime.now()
 
@@ -167,18 +161,16 @@ async def verificar_expiracoes():
 
         await asyncio.sleep(60)
 
-# ================= WEBHOOK =================
+# ================= WEBHOOK MP =================
 @app.post("/webhook")
 async def webhook(request: Request):
     data = await request.json()
-    print("WEBHOOK:", data)
+    print("WEBHOOK MP:", data)
 
     if data.get("type") == "payment":
         payment_id = data["data"]["id"]
 
         payment = sdk.payment().get(payment_id)
-        print("PAGAMENTO:", payment)
-
         status = payment["response"].get("status")
 
         if status == "approved":
@@ -191,6 +183,17 @@ async def webhook(request: Request):
             await liberar_acesso(user_id, valor)
 
     return {"status": "ok"}
+
+# ================= WEBHOOK TELEGRAM =================
+@app.post(f"/telegram/{TELEGRAM_TOKEN}")
+async def telegram_webhook(request: Request):
+    data = await request.json()
+
+    update = Update.de_json(data, bot)
+
+    await app_bot.process_update(update)
+
+    return {"ok": True}
 
 # ================= BOTÕES =================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -222,25 +225,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         valor = query.data.split("_")[1]
         await gerar_pix(update, valor)
 
-# ================= RUN =================
-def run_bot():
-    import asyncio
-    asyncio.set_event_loop(asyncio.new_event_loop())
+# ================= HANDLERS =================
+app_bot.add_handler(CommandHandler("start", start))
+app_bot.add_handler(CallbackQueryHandler(button))
 
-    app_bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-
-    app_bot.add_handler(CommandHandler("start", start))
-    app_bot.add_handler(CallbackQueryHandler(button))
-
-    print("🤖 Bot rodando...")
-    app_bot.run_polling(close_loop=False)
-
+# ================= MAIN =================
 def main():
-    threading.Thread(target=run_bot).start()
-    time.sleep(2)
-
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+
     loop.create_task(verificar_expiracoes())
 
     uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
