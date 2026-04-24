@@ -193,17 +193,23 @@ async def telegram_webhook(request: Request):
 
 # ================= MERCADOPAGO =================
 
-@app.post("/webhook")
-async def mp_webhook(request: Request):
-    data = await request.json()
+@app.post(f"/telegram/{TELEGRAM_TOKEN}")
+async def telegram_webhook(request: Request):
+    try:
+        data = await request.json()
+        print("🔥 UPDATE:", data)
 
-    if data.get("type") == "payment":
-        payment_id = data["data"]["id"]
-        payment = sdk.payment().get(payment_id)
+        if not app_bot:
+            print("❌ BOT NÃO INICIALIZADO")
+            return {"ok": False}
 
-        if payment["response"].get("status") == "approved":
-            user_id = int(payment["response"]["description"].split("-")[1])
-            valor = str(payment["response"]["transaction_amount"])
-            await liberar_acesso(user_id, valor)
+        update = Update.de_json(data, app_bot.bot)
 
-    return {"ok": True}
+        if update:
+            await app_bot.process_update(update)
+
+        return {"ok": True}
+
+    except Exception as e:
+        print("❌ ERRO WEBHOOK:", str(e))
+        return {"ok": True}
